@@ -15,26 +15,53 @@
         android:inputType="textPersonName"
         android:hint="Link" />
 
-    <TextView
-        android:id="@+id/rozmiar"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/typ"
+        <TextView
+            android:id="@+id/file_size"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="File size " />
+
+        <TextView
+            android:id="@+id/size"
+            android:layout_width="278dp"
+            android:layout_height="wrap_content"
+            android:text="First connect via link"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rozmiar"
-        app:layout_constraintVertical_bias="0.583" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/file_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Connection type" />
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="279dp"
+            android:layout_height="wrap_content"
+            android:text="First connect via link"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/size"
+            app:layout_constraintVertical_bias="0.583" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,13 +72,13 @@
             android:id="@+id/getInfo"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Information" />
 
         <Button
             android:id="@+id/download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Button" />
+            android:text="Download" />
     </LinearLayout>
 </LinearLayout>

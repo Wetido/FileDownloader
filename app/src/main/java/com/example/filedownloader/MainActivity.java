@@ -19,14 +19,19 @@ import android.widget.Toast;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final Pattern HTTPS_PATTERN = Pattern.compile("https://.+");
 
     TextView mRozmiarTextView;
     TextView mTypTextView;
     Button mGetInfoBtn;
     Button mDownloadBtn;
     EditText mInputLink;
+
+    final static String TEST_LINK = "https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.6.15.tar.xz";
 
     final static int PERM_CODE = 1000;
 
@@ -35,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRozmiarTextView = findViewById(R.id.rozmiar);
-        mTypTextView = findViewById(R.id.typ);
+        mRozmiarTextView = findViewById(R.id.size);
+        mTypTextView = findViewById(R.id.type);
         mGetInfoBtn = findViewById(R.id.getInfo);
         mDownloadBtn = findViewById(R.id.download);
         mInputLink = findViewById(R.id.inputTextField);
+
+        mInputLink.setText(TEST_LINK);
 
         setListeners();
     }
@@ -52,10 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
                 String mLink = mInputLink.getText().toString();
 
-                ///VALIDACJA
+                if(validate(mLink)){
 
-                GetUrlDataTask task = new GetUrlDataTask(mLink);
-                task.execute();
+                    GetUrlDataTask task = new GetUrlDataTask(mLink);
+                    task.execute();
+                }
             }
         });
 
@@ -63,16 +71,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_DENIED){
+                String mLink = mInputLink.getText().toString();
 
-                    String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                    requestPermissions( permissions, PERM_CODE);
-                    ///perm denied
-                } else {
+                if( validate(mLink) ){
 
-                    Toast.makeText(getBaseContext(), "Zaczynam pobieranie", Toast.LENGTH_SHORT).show();
-                    download();
+                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_DENIED){
+
+                        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                        requestPermissions( permissions, PERM_CODE);
+                        ///perm denied
+                    } else {
+
+                        Toast.makeText(getBaseContext(), "Zaczynam pobieranie", Toast.LENGTH_SHORT).show();
+                        download(mLink);
+                    }
                 }
             }
         });
@@ -87,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    download();
-                    Toast.makeText(this, "Zaczynam pobieranie", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Posiadam uprawienia", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, "Brak uprawnien", Toast.LENGTH_SHORT).show();
                 }
@@ -96,10 +108,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void download(){
+    public void download(String link){
+
 
         DownloadManager downloadmanager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        Uri uri = Uri.parse("https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.6.15.tar.xz");
+        Uri uri = Uri.parse(link);
 
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setTitle("My File");
@@ -111,7 +124,23 @@ public class MainActivity extends AppCompatActivity {
         downloadmanager.enqueue(request);
     }
 
-    protected class GetUrlDataTask extends AsyncTask<Void, Void, URL>
+    Boolean validate(String link){
+
+        if( !HTTPS_PATTERN.matcher(link).matches() ){
+
+            Toast.makeText(MainActivity.this, "LINK MUST BE FORMATED 'https://...'", Toast.LENGTH_LONG).show();
+            return false;
+        } else if( link.isEmpty() ){
+
+            Toast.makeText(MainActivity.this, "LINK CANNOT BE EMPTY", Toast.LENGTH_LONG).show();
+            return false;
+        } else {
+
+            return true;
+        }
+    }
+
+    protected class GetUrlDataTask extends AsyncTask<Void, Void, Void>
     {
         private String url;
 
@@ -122,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
         @SuppressLint("WrongThread")
         @Override
-        protected URL doInBackground(Void... params)
+        protected Void doInBackground(Void... params)
         {
             String str = url;
 
@@ -143,8 +172,6 @@ public class MainActivity extends AppCompatActivity {
             } finally {
                 if (polaczenie != null) polaczenie.disconnect();
             }
-
-
             return null;
         }
 
